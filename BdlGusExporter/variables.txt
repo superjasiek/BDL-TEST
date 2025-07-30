@@ -1,0 +1,6 @@
+# W tym pliku wpisz identyfikatory zmiennych z BDL GUS, każdą w nowej linii.
+# Linie zaczynające się od # są ignorowane.
+# Przykładowe ID:
+450, liczba mieszkańców
+645, przyrost naturalny
+74352, przyrost naturalny na 1000

@@ -1,0 +1,143 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Window x:Class="BdlGusExporterWPF.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="BDL GUS Exporter"
+        Height="500" Width="900"
+        FontFamily="Segoe UI"
+        FontSize="14">
+    <Window.Resources>
+        <!-- Kolory akcentu -->
+        <SolidColorBrush x:Key="PrimaryBrush" Color="#FF1E88E5"/>
+        <SolidColorBrush x:Key="AccentBrush"  Color="#FF29B6F6"/>
+
+        <!-- Styl przycisków -->
+        <Style TargetType="Button">
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="Background" Value="{StaticResource PrimaryBrush}"/>
+            <Setter Property="BorderBrush" Value="{x:Null}"/>
+            <Setter Property="Height" Value="40"/>
+            <Setter Property="MinWidth" Value="100"/>
+            <Setter Property="Padding" Value="10,5"/>
+            <Setter Property="Margin" Value="0,5"/>
+            <Setter Property="FontSize" Value="14"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border Background="{TemplateBinding Background}"
+                                CornerRadius="8">
+                            <ContentPresenter HorizontalAlignment="Center"
+                                              VerticalAlignment="Center"/>
+                        </Border>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <!-- Style dla TreeView, ListBox i DataGrid -->
+        <Style TargetType="TreeView">
+            <Setter Property="FontSize" Value="14"/>
+            <Setter Property="Padding" Value="5"/>
+            <Setter Property="BorderBrush" Value="{StaticResource AccentBrush}"/>
+            <Setter Property="BorderThickness" Value="1"/>
+        </Style>
+        <Style TargetType="ListBox">
+            <Setter Property="FontSize" Value="14"/>
+            <Setter Property="Padding" Value="5"/>
+            <Setter Property="BorderBrush" Value="{StaticResource AccentBrush}"/>
+            <Setter Property="BorderThickness" Value="1"/>
+        </Style>
+        <Style TargetType="DataGrid">
+            <Setter Property="FontSize" Value="14"/>
+            <Setter Property="RowHeight" Value="30"/>
+            <Setter Property="GridLinesVisibility" Value="Horizontal"/>
+            <Setter Property="BorderBrush" Value="{StaticResource AccentBrush}"/>
+        </Style>
+    </Window.Resources>
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <!-- Pasek klucza API -->
+        <StackPanel Orientation="Horizontal" Margin="15" Grid.Row="0">
+            <CheckBox x:Name="chkUseApiKey"
+                      Content="Użyj klucza API"
+                      VerticalAlignment="Center"
+                      Margin="0,0,10,0"/>
+            <TextBox x:Name="txtApiKey"
+                     Width="300"
+                     FontSize="14"
+                     VerticalAlignment="Center"
+                     IsEnabled="{Binding IsChecked, ElementName=chkUseApiKey}"
+                     ToolTip="Wpisz swój klucz API"/>
+        </StackPanel>
+
+        <!-- Główna część: drzewo, przyciski, lista -->
+        <Grid Grid.Row="1" Margin="15">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+
+            <!-- Drzewo jednostek -->
+            <TreeView x:Name="treeUnits"
+                      Grid.Column="0"
+                      Margin="5"/>
+
+            <!-- Panel przycisków -->
+            <StackPanel Grid.Column="1"
+                        HorizontalAlignment="Center"
+                        VerticalAlignment="Center"
+                        Margin="30,0">
+                <Button x:Name="btnAdd"
+                        Content="→"
+                        Width="36" Height="36"
+                        FontSize="18"
+                        Background="{StaticResource AccentBrush}"
+                        Click="BtnAdd_Click"
+                        ToolTip="Dodaj jednostkę"/>
+                <Button x:Name="btnRemove"
+                        Content="←"
+                        Width="36" Height="36"
+                        FontSize="18"
+                        Background="{StaticResource AccentBrush}"
+                        Click="BtnRemove_Click"
+                        ToolTip="Usuń jednostkę"/>
+                <Button x:Name="btnClear"
+                        Content="Wyczyść"
+                        Width="100"
+                        Margin="0,10,0,0"
+                        Click="BtnClear_Click"/>
+                <Button x:Name="btnExport"
+                        Content="Eksportuj"
+                        Width="120"
+                        Click="BtnExport_Click"/>
+            </StackPanel>
+
+            <!-- Lista wybranych jednostek -->
+            <ListBox x:Name="listSelected"
+                     Grid.Column="2"
+                     Margin="5"/>
+        </Grid>
+
+        <!-- Pasek postępu i status -->
+        <StatusBar Grid.Row="2" Background="#FFF0F0F0">
+            <ProgressBar x:Name="progressBar"
+                         Width="250"
+                         Height="18"
+                         Minimum="0"
+                         Maximum="100"
+                         Value="0"
+                         Margin="5,0"/>
+            <TextBlock x:Name="txtStatus"
+                       VerticalAlignment="Center"
+                       Margin="15,0,0,0"
+                       Text="Gotowy"/>
+        </StatusBar>
+    </Grid>
+</Window>
