@@ -1,8 +1,10 @@
-Microsoft Visual Studio Solution File, Format Version 12.00
+﻿Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.5.2.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BdlGusExporterWPF", "BdlGusExporterWPF.csproj", "{AC95026F-FA68-0811-8F6F-F839A1D2D6C0}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BdlGusExporter.Core", "..\BdlGusExporter.Core\BdlGusExporter.Core.csproj", "{D9424AB3-6536-43EC-AE12-1A5BE7D46698}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -14,6 +16,10 @@ Global
 		{AC95026F-FA68-0811-8F6F-F839A1D2D6C0}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{AC95026F-FA68-0811-8F6F-F839A1D2D6C0}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{AC95026F-FA68-0811-8F6F-F839A1D2D6C0}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D9424AB3-6536-43EC-AE12-1A5BE7D46698}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D9424AB3-6536-43EC-AE12-1A5BE7D46698}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D9424AB3-6536-43EC-AE12-1A5BE7D46698}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D9424AB3-6536-43EC-AE12-1A5BE7D46698}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

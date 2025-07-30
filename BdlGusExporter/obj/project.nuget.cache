@@ -1,17 +1,17 @@
 {
   "version": 2,
-  "dgSpecHash": "SSzMv937IBY=",
+  "dgSpecHash": "SdP3Nx3PLI0=",
   "success": true,
   "projectFilePath": "/app/BdlGusExporter/BdlGusExporterWPF.csproj",
   "expectedPackageFiles": [
-    "/home/jules/.nuget/packages/closedxml/0.104.0/closedxml.0.104.0.nupkg.sha512",
-    "/home/jules/.nuget/packages/closedxml.parser/1.2.0/closedxml.parser.1.2.0.nupkg.sha512",
-    "/home/jules/.nuget/packages/documentformat.openxml/3.0.1/documentformat.openxml.3.0.1.nupkg.sha512",
-    "/home/jules/.nuget/packages/documentformat.openxml.framework/3.0.1/documentformat.openxml.framework.3.0.1.nupkg.sha512",
+    "/home/jules/.nuget/packages/closedxml/0.105.0/closedxml.0.105.0.nupkg.sha512",
+    "/home/jules/.nuget/packages/closedxml.parser/2.0.0/closedxml.parser.2.0.0.nupkg.sha512",
+    "/home/jules/.nuget/packages/documentformat.openxml/3.1.1/documentformat.openxml.3.1.1.nupkg.sha512",
+    "/home/jules/.nuget/packages/documentformat.openxml.framework/3.1.1/documentformat.openxml.framework.3.1.1.nupkg.sha512",
     "/home/jules/.nuget/packages/excelnumberformat/1.1.0/excelnumberformat.1.1.0.nupkg.sha512",
-    "/home/jules/.nuget/packages/rbush/3.2.0/rbush.3.2.0.nupkg.sha512",
+    "/home/jules/.nuget/packages/rbush.signed/4.0.0/rbush.signed.4.0.0.nupkg.sha512",
     "/home/jules/.nuget/packages/sixlabors.fonts/1.0.0/sixlabors.fonts.1.0.0.nupkg.sha512",
-    "/home/jules/.nuget/packages/system.io.packaging/8.0.0/system.io.packaging.8.0.0.nupkg.sha512",
+    "/home/jules/.nuget/packages/system.io.packaging/8.0.1/system.io.packaging.8.0.1.nupkg.sha512",
     "/home/jules/.nuget/packages/microsoft.windowsdesktop.app.ref/8.0.18/microsoft.windowsdesktop.app.ref.8.0.18.nupkg.sha512"
   ],
   "logs": []
