@@ -27,3 +27,6 @@
 /app/BdlGusExporter/obj/Debug/net8.0-windows/BdlGusExporterWPF.pdb
 /app/BdlGusExporter/obj/Debug/net8.0-windows/BdlGusExporterWPF.genruntimeconfig.cache
 /app/BdlGusExporter/obj/Debug/net8.0-windows/ref/BdlGusExporterWPF.dll
+/app/BdlGusExporter/bin/Debug/net8.0-windows/System.IO.Packaging.dll
+/app/BdlGusExporter/bin/Debug/net8.0-windows/BdlGusExporter.Core.dll
+/app/BdlGusExporter/bin/Debug/net8.0-windows/BdlGusExporter.Core.pdb

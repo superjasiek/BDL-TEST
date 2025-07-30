@@ -2,15 +2,14 @@
   "version": 3,
   "targets": {
     "net8.0-windows7.0": {
-      "ClosedXML/0.104.0": {
+      "ClosedXML/0.105.0": {
         "type": "package",
         "dependencies": {
-          "ClosedXML.Parser": "[1.2.0, 2.0.0)",
-          "DocumentFormat.OpenXml": "[3.0.1, 4.0.0)",
+          "ClosedXML.Parser": "2.0.0",
+          "DocumentFormat.OpenXml": "[3.1.1, 4.0.0)",
           "ExcelNumberFormat": "1.1.0",
-          "RBush": "3.2.0",
-          "SixLabors.Fonts": "1.0.0",
-          "System.IO.Packaging": "8.0.0"
+          "RBush.Signed": "4.0.0",
+          "SixLabors.Fonts": "1.0.0"
         },
         "compile": {
           "lib/netstandard2.1/ClosedXML.dll": {
@@ -23,7 +22,7 @@
           }
         }
       },
-      "ClosedXML.Parser/1.2.0": {
+      "ClosedXML.Parser/2.0.0": {
         "type": "package",
         "compile": {
           "lib/netstandard2.1/ClosedXML.Parser.dll": {
@@ -36,10 +35,10 @@
           }
         }
       },
-      "DocumentFormat.OpenXml/3.0.1": {
+      "DocumentFormat.OpenXml/3.1.1": {
         "type": "package",
         "dependencies": {
-          "DocumentFormat.OpenXml.Framework": "3.0.1"
+          "DocumentFormat.OpenXml.Framework": "3.1.1"
         },
         "compile": {
           "lib/net8.0/DocumentFormat.OpenXml.dll": {
@@ -52,10 +51,10 @@
           }
         }
       },
-      "DocumentFormat.OpenXml.Framework/3.0.1": {
+      "DocumentFormat.OpenXml.Framework/3.1.1": {
         "type": "package",
         "dependencies": {
-          "System.IO.Packaging": "8.0.0"
+          "System.IO.Packaging": "8.0.1"
         },
         "compile": {
           "lib/net8.0/DocumentFormat.OpenXml.Framework.dll": {
@@ -81,15 +80,15 @@
           }
         }
       },
-      "RBush/3.2.0": {
+      "RBush.Signed/4.0.0": {
         "type": "package",
         "compile": {
-          "lib/net6.0/RBush.dll": {
+          "lib/net8.0/RBush.dll": {
             "related": ".xml"
           }
         },
         "runtime": {
-          "lib/net6.0/RBush.dll": {
+          "lib/net8.0/RBush.dll": {
             "related": ".xml"
           }
         }
@@ -107,7 +106,7 @@
           }
         }
       },
-      "System.IO.Packaging/8.0.0": {
+      "System.IO.Packaging/8.0.1": {
         "type": "package",
         "compile": {
           "lib/net8.0/System.IO.Packaging.dll": {
@@ -122,18 +121,31 @@
         "build": {
           "buildTransitive/net6.0/_._": {}
         }
+      },
+      "BdlGusExporter.Core/1.0.0": {
+        "type": "project",
+        "framework": ".NETCoreApp,Version=v8.0",
+        "dependencies": {
+          "ClosedXML": "0.105.0"
+        },
+        "compile": {
+          "bin/placeholder/BdlGusExporter.Core.dll": {}
+        },
+        "runtime": {
+          "bin/placeholder/BdlGusExporter.Core.dll": {}
+        }
       }
     }
   },
   "libraries": {
-    "ClosedXML/0.104.0": {
-      "sha512": "rZagdoWY5QdrpvgFZvwoPtjvvoGcwRTr4YQ+3mM2iREczrgKlxMLGyWr7xxIISC6L3llNyDFhazc8mYlKbIQ9g==",
+    "ClosedXML/0.105.0": {
+      "sha512": "U0hAdnYyPvF7TqHMFloxrS7pmozab79tFFF4c/bgPtqeelUs7ILpUd3r3c7C0a/DXsUZb3k1n4Pf7Q2LMyMQOg==",
       "type": "package",
-      "path": "closedxml/0.104.0",
+      "path": "closedxml/0.105.0",
       "files": [
         ".nupkg.metadata",
         ".signature.p7s",
-        "closedxml.0.104.0.nupkg.sha512",
+        "closedxml.0.105.0.nupkg.sha512",
         "closedxml.nuspec",
         "lib/netstandard2.0/ClosedXML.dll",
         "lib/netstandard2.0/ClosedXML.pdb",
@@ -144,15 +156,15 @@
         "nuget-logo.png"
       ]
     },
-    "ClosedXML.Parser/1.2.0": {
-      "sha512": "w+/0tsxABS3lkSH8EUlA7IGme+mq5T/Puf3DbOiTckmSuUpAUO2LK29oXYByCcWkBv6wcRHxgWlQb1lxkwI0Tw==",
+    "ClosedXML.Parser/2.0.0": {
+      "sha512": "ngTqjYreDYNytG1W5d3ewHsw0ukmmrgV7EKnS4/40rXoYZGt07jrBvo+N+GxT49rcageUMUiprV0jYT4nwVBHQ==",
       "type": "package",
-      "path": "closedxml.parser/1.2.0",
+      "path": "closedxml.parser/2.0.0",
       "files": [
         ".nupkg.metadata",
         ".signature.p7s",
         "README.md",
-        "closedxml.parser.1.2.0.nupkg.sha512",
+        "closedxml.parser.2.0.0.nupkg.sha512",
         "closedxml.parser.nuspec",
         "lib/netstandard2.0/ClosedXML.Parser.dll",
         "lib/netstandard2.0/ClosedXML.Parser.xml",
@@ -160,14 +172,15 @@
         "lib/netstandard2.1/ClosedXML.Parser.xml"
       ]
     },
-    "DocumentFormat.OpenXml/3.0.1": {
-      "sha512": "DCK1cwFUJ1FGGyYyo++HWl9H1RkqMWIu+FGOLRy6E4L4y0/HIhlJ7N/n1HKboFfOwKn1cMBRxt1RCuDbIEy5YQ==",
+    "DocumentFormat.OpenXml/3.1.1": {
+      "sha512": "2z9QBzeTLNNKWM9SaOSDMegfQk/7hDuElOsmF77pKZMkFRP/GHA/W/4yOAQD9kn15N/FsFxHn3QVYkatuZghiA==",
       "type": "package",
-      "path": "documentformat.openxml/3.0.1",
+      "path": "documentformat.openxml/3.1.1",
       "files": [
         ".nupkg.metadata",
         ".signature.p7s",
-        "documentformat.openxml.3.0.1.nupkg.sha512",
+        "README.md",
+        "documentformat.openxml.3.1.1.nupkg.sha512",
         "documentformat.openxml.nuspec",
         "icon.png",
         "lib/net35/DocumentFormat.OpenXml.dll",
@@ -182,14 +195,15 @@
         "lib/netstandard2.0/DocumentFormat.OpenXml.xml"
       ]
     },
-    "DocumentFormat.OpenXml.Framework/3.0.1": {
-      "sha512": "ifyI7OW7sggz7LQMIAD2aUsY/zVUON9QaHrpZ4MK33iVMeHlTG4uhUE2aLWb31nry+LCs2ALDAwf8OfUJGjgBg==",
+    "DocumentFormat.OpenXml.Framework/3.1.1": {
+      "sha512": "6APEp/ElZV58S/4v8mf4Ke3ONEDORs64MqdD64Z7wWpcHANB9oovQsGIwtqjnKihulOj7T0a6IxHIHOfMqKOng==",
       "type": "package",
-      "path": "documentformat.openxml.framework/3.0.1",
+      "path": "documentformat.openxml.framework/3.1.1",
       "files": [
         ".nupkg.metadata",
         ".signature.p7s",
-        "documentformat.openxml.framework.3.0.1.nupkg.sha512",
+        "README.md",
+        "documentformat.openxml.framework.3.1.1.nupkg.sha512",
         "documentformat.openxml.framework.nuspec",
         "icon.png",
         "lib/net35/DocumentFormat.OpenXml.Framework.dll",
@@ -224,21 +238,21 @@
         "lib/netstandard2.0/ExcelNumberFormat.xml"
       ]
     },
-    "RBush/3.2.0": {
-      "sha512": "ijGh9N0zZ7JfXk3oQkWCwK8SwSSByexbyh/MjbCjNxOft9eG5ZqKC1vdgiYq78h4IZRFmN4s3JZ/b10Jipud5w==",
+    "RBush.Signed/4.0.0": {
+      "sha512": "aP5KQxL5RnFNGW1f0euYVBfCatkLw5iEzMRJcXKq8LWWP4Cp3+qoSq1tDDL2vvJ2rM0ychmVMa2VaEKLS6uX4w==",
       "type": "package",
-      "path": "rbush/3.2.0",
+      "path": "rbush.signed/4.0.0",
       "files": [
         ".nupkg.metadata",
         ".signature.p7s",
-        "lib/net6.0/RBush.dll",
-        "lib/net6.0/RBush.xml",
-        "lib/netcoreapp3.1/RBush.dll",
-        "lib/netcoreapp3.1/RBush.xml",
-        "lib/netstandard1.2/RBush.dll",
-        "lib/netstandard1.2/RBush.xml",
-        "rbush.3.2.0.nupkg.sha512",
-        "rbush.nuspec",
+        "lib/net47/RBush.dll",
+        "lib/net47/RBush.xml",
+        "lib/net8.0/RBush.dll",
+        "lib/net8.0/RBush.xml",
+        "lib/netstandard2.0/RBush.dll",
+        "lib/netstandard2.0/RBush.xml",
+        "rbush.signed.4.0.0.nupkg.sha512",
+        "rbush.signed.nuspec",
         "readme.md"
       ]
     },
@@ -260,10 +274,10 @@
         "sixlabors.fonts.nuspec"
       ]
     },
-    "System.IO.Packaging/8.0.0": {
-      "sha512": "8g1V4YRpdGAxFcK8v9OjuMdIOJSpF30Zb1JGicwVZhly3I994WFyBdV6mQEo8d3T+URQe55/M0U0eIH0Hts1bg==",
+    "System.IO.Packaging/8.0.1": {
+      "sha512": "KYkIOAvPexQOLDxPO2g0BVoWInnQhPpkFzRqvNrNrMhVT6kqhVr0zEb6KCHlptLFukxnZrjuMVAnxK7pOGUYrw==",
       "type": "package",
-      "path": "system.io.packaging/8.0.0",
+      "path": "system.io.packaging/8.0.1",
       "files": [
         ".nupkg.metadata",
         ".signature.p7s",
@@ -284,15 +298,21 @@
         "lib/net8.0/System.IO.Packaging.xml",
         "lib/netstandard2.0/System.IO.Packaging.dll",
         "lib/netstandard2.0/System.IO.Packaging.xml",
-        "system.io.packaging.8.0.0.nupkg.sha512",
+        "system.io.packaging.8.0.1.nupkg.sha512",
         "system.io.packaging.nuspec",
         "useSharedDesignerContext.txt"
       ]
+    },
+    "BdlGusExporter.Core/1.0.0": {
+      "type": "project",
+      "path": "../BdlGusExporter.Core/BdlGusExporter.Core.csproj",
+      "msbuildProject": "../BdlGusExporter.Core/BdlGusExporter.Core.csproj"
     }
   },
   "projectFileDependencyGroups": {
     "net8.0-windows7.0": [
-      "ClosedXML >= 0.104.0"
+      "BdlGusExporter.Core >= 1.0.0",
+      "ClosedXML >= 0.105.0"
     ]
   },
   "packageFolders": {
@@ -319,7 +339,11 @@
       "frameworks": {
         "net8.0-windows7.0": {
           "targetAlias": "net8.0-windows",
-          "projectReferences": {}
+          "projectReferences": {
+            "/app/BdlGusExporter.Core/BdlGusExporter.Core.csproj": {
+              "projectPath": "/app/BdlGusExporter.Core/BdlGusExporter.Core.csproj"
+            }
+          }
         }
       },
       "warningProperties": {
@@ -339,7 +363,7 @@
         "dependencies": {
           "ClosedXML": {
             "target": "Package",
-            "version": "[0.104.0, )"
+            "version": "[0.105.0, )"
           }
         },
         "imports": [
