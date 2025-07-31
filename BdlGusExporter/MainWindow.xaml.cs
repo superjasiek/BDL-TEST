@@ -21,6 +21,7 @@ namespace BdlGusExporterWPF
         private readonly HttpClient _httpClient = new HttpClient();
         private readonly List<string> _selectedIds = new List<string>();
         private readonly ApiRateLimiter _apiRateLimiter = new ApiRateLimiter();
+        private readonly JsonCache _jsonCache = new JsonCache();
 
         public MainWindow()
         {
@@ -59,6 +60,11 @@ namespace BdlGusExporterWPF
 
         private async Task<string> GetStringAsyncWithRateLimit(string url)
         {
+            if (_jsonCache.TryGet(url, out var cachedJson))
+            {
+                return cachedJson;
+            }
+
             var isRegistered = IsUserRegistered();
             const int maxRetries = 3;
             const int delayInMs = 1100; // 1.1 seconds to be safe
@@ -76,6 +82,7 @@ namespace BdlGusExporterWPF
                     try
                     {
                         var json = await _httpClient.GetStringAsync(url);
+                        _jsonCache.Set(url, json);
                         return json;
                     }
                     catch (HttpRequestException ex) when (ex.StatusCode == HttpStatusCode.TooManyRequests)
@@ -229,6 +236,22 @@ namespace BdlGusExporterWPF
         {
             listSelected.Items.Clear();
             _selectedIds.Clear();
+        }
+
+        private void BtnClearCache_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                _jsonCache.Clear();
+                txtStatus.Text = "Pamięć podręczna API została wyczyszczona.";
+                MessageBox.Show("Pamięć podręczna API została pomyślnie wyczyszczona.", "Sukces",
+                                MessageBoxButton.OK, MessageBoxImage.Information);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Błąd podczas czyszczenia pamięci podręcznej: {ex.Message}", "Błąd",
+                                MessageBoxButton.OK, MessageBoxImage.Error);
+            }
         }
 
         private async void BtnExport_Click(object sender, RoutedEventArgs e)
