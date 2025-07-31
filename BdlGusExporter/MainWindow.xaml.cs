@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Net;
 using System.Net.Http;
 using System.Text.Json;
 using System.Threading.Tasks;
@@ -59,18 +60,38 @@ namespace BdlGusExporterWPF
         private async Task<string> GetStringAsyncWithRateLimit(string url)
         {
             var isRegistered = IsUserRegistered();
-            RateLimitLease lease = null;
-            try
+            const int maxRetries = 3;
+            const int delayInMs = 1100; // 1.1 seconds to be safe
+
+            for (int i = 0; i < maxRetries; i++)
             {
-                lease = await _apiRateLimiter.AcquireAsync(isRegistered);
-                var json = await _httpClient.GetStringAsync(url);
-                return json;
+                using (var lease = await _apiRateLimiter.AcquireAsync(isRegistered))
+                {
+                    if (!lease.IsAcquired)
+                    {
+                        await Task.Delay(delayInMs);
+                        continue;
+                    }
+
+                    try
+                    {
+                        var json = await _httpClient.GetStringAsync(url);
+                        return json;
+                    }
+                    catch (HttpRequestException ex) when (ex.StatusCode == HttpStatusCode.TooManyRequests)
+                    {
+                        if (i >= maxRetries - 1)
+                        {
+                            throw; // Last retry failed, rethrow.
+                        }
+                        Dispatcher.Invoke(() => {
+                            txtStatus.Text = $"Błąd 429: Zbyt wiele żądań. Ponawiam za {delayInMs} ms...";
+                        });
+                        await Task.Delay(delayInMs);
+                    }
+                }
             }
-            finally
-            {
-                lease?.Dispose();
-                Dispatcher.Invoke(UpdateRateLimitDisplay);
-            }
+            throw new Exception($"Nie udało się pobrać danych z {url} po {maxRetries} próbach.");
         }
 
         private void SetApiKey()
@@ -93,6 +114,8 @@ namespace BdlGusExporterWPF
             {
                 var urlRoot = $"{ApiBase}/units?level=0&format=json";
                 var json    = await GetStringAsyncWithRateLimit(urlRoot);
+                Dispatcher.Invoke(UpdateRateLimitDisplay);
+
                 var doc     = JsonDocument.Parse(json);
 
                 if (doc.RootElement.TryGetProperty("results", out var results))
@@ -136,6 +159,8 @@ namespace BdlGusExporterWPF
                 {
                     var url  = $"{ApiBase}/units?parent-id={info.Id}&level={childLevel}&format=json&page-size=100";
                     var json = await GetStringAsyncWithRateLimit(url);
+                    Dispatcher.Invoke(UpdateRateLimitDisplay);
+
                     var doc  = JsonDocument.Parse(json);
 
                     if (doc.RootElement.TryGetProperty("results", out var results))
@@ -257,6 +282,8 @@ namespace BdlGusExporterWPF
                         var queryYears = string.Join("&", years.Select(y => $"year={y}"));
                         var url        = $"{ApiBase}/data/by-unit/{unitId}?var-id={varId}&{queryYears}&format=json";
                         var json       = await GetStringAsyncWithRateLimit(url);
+                        Dispatcher.Invoke(UpdateRateLimitDisplay);
+
                         var doc        = JsonDocument.Parse(json);
                         var dict       = new Dictionary<int, decimal>();
                         if (doc.RootElement.TryGetProperty("results", out var resArr) && resArr.GetArrayLength() > 0)
