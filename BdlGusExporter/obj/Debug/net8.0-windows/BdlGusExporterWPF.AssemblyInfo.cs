@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("BdlGusExporterWPF")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+62b6cb06c7692fbb5593e55adc9cebc5126bd1c6")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+5ef3f5b973643df44886f6d442f230cfeed1708c")]
 [assembly: System.Reflection.AssemblyProductAttribute("BdlGusExporterWPF")]
 [assembly: System.Reflection.AssemblyTitleAttribute("BdlGusExporterWPF")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

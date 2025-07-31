@@ -1,4 +1,4 @@
-using BdlGusExporter.Core; // Use the new core library
+using BdlGusExporter.Core;
 using Microsoft.Win32;
 using System;
 using System.Collections.Generic;
@@ -7,6 +7,7 @@ using System.Linq;
 using System.Text.Json;
 using System.Threading.Tasks;
 using System.Windows;
+using System.Threading.RateLimiting;
 using System.Windows.Controls;
 using System.Windows.Input;
 
@@ -14,28 +15,28 @@ namespace BdlGusExporterWPF
 {
     public partial class MainWindow : Window
     {
-        // Services from the core library
         private readonly GusApiService _gusApiService = new GusApiService();
         private readonly ExcelExportService _excelExportService = new ExcelExportService();
-
-        // The list of selected unit IDs is still managed by the UI
+        private readonly RateLimiterService _rateLimiterService = new RateLimiterService();
         private readonly List<string> _selectedIds = new List<string>();
 
         public MainWindow()
         {
             InitializeComponent();
+            Closing += OnClosing;
 
-            // API key handling is now delegated to the service
             chkUseApiKey.Checked += (_, __) => UpdateApiKey();
             chkUseApiKey.Unchecked += (_, __) => UpdateApiKey();
             txtApiKey.TextChanged += (_, __) => { if (chkUseApiKey.IsChecked == true) UpdateApiKey(); };
 
-            // Tree initialization
             treeUnits.AddHandler(TreeViewItem.ExpandedEvent, new RoutedEventHandler(TreeItem_Expanded));
             LoadRootUnit();
-
-            // Ctrl+click handler remains the same
             treeUnits.SelectedItemChanged += TreeUnits_SelectedItemChanged;
+        }
+
+        private void OnClosing(object sender, System.ComponentModel.CancelEventArgs e)
+        {
+            _rateLimiterService.Dispose();
         }
 
         private void UpdateApiKey()
@@ -49,16 +50,19 @@ namespace BdlGusExporterWPF
             UpdateApiKey();
             try
             {
-                using var doc = await _gusApiService.GetUnitsAsync(); // Use the service
-                if (doc.RootElement.TryGetProperty("results", out var results))
+                using (await AcquireRateLimitPermit())
                 {
-                    foreach (var el in results.EnumerateArray().OrderBy(x => x.GetProperty("name").GetString()))
+                    using var doc = await _gusApiService.GetUnitsAsync();
+                    if (doc.RootElement.TryGetProperty("results", out var results))
                     {
-                        var id = el.GetProperty("id").GetString();
-                        var name = el.GetProperty("name").GetString();
-                        var item = new TreeViewItem { Header = name, Tag = new UnitInfo(id, 0) };
-                        item.Items.Add(null); // placeholder for lazy-load
-                        treeUnits.Items.Add(item);
+                        foreach (var el in results.EnumerateArray().OrderBy(x => x.GetProperty("name").GetString()))
+                        {
+                            var id = el.GetProperty("id").GetString();
+                            var name = el.GetProperty("name").GetString();
+                            var item = new TreeViewItem { Header = name, Tag = new UnitInfo(id, 0) };
+                            item.Items.Add(null);
+                            treeUnits.Items.Add(item);
+                        }
                     }
                 }
             }
@@ -79,16 +83,19 @@ namespace BdlGusExporterWPF
                 UpdateApiKey();
                 try
                 {
-                    using var doc = await _gusApiService.GetUnitsAsync(info.Id, childLevel); // Use the service
-                    if (doc.RootElement.TryGetProperty("results", out var results))
+                    using (await AcquireRateLimitPermit())
                     {
-                        foreach (var el in results.EnumerateArray().OrderBy(x => x.GetProperty("name").GetString()))
+                        using var doc = await _gusApiService.GetUnitsAsync(info.Id, childLevel);
+                        if (doc.RootElement.TryGetProperty("results", out var results))
                         {
-                            var id = el.GetProperty("id").GetString();
-                            var name = el.GetProperty("name").GetString();
-                            var child = new TreeViewItem { Header = name, Tag = new UnitInfo(id, childLevel) };
-                            if (childLevel != 6) child.Items.Add(null);
-                            tvi.Items.Add(child);
+                            foreach (var el in results.EnumerateArray().OrderBy(x => x.GetProperty("name").GetString()))
+                            {
+                                var id = el.GetProperty("id").GetString();
+                                var name = el.GetProperty("name").GetString();
+                                var child = new TreeViewItem { Header = name, Tag = new UnitInfo(id, childLevel) };
+                                if (childLevel != 6) child.Items.Add(null);
+                                tvi.Items.Add(child);
+                            }
                         }
                     }
                 }
@@ -99,7 +106,6 @@ namespace BdlGusExporterWPF
             }
         }
 
-        // --- UI Event Handlers for selection (no changes needed here) ---
         private void TreeUnits_SelectedItemChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
         {
             if ((Keyboard.IsKeyDown(Key.LeftCtrl) || Keyboard.IsKeyDown(Key.RightCtrl)) && e.NewValue is TreeViewItem tvi && tvi.Tag is UnitInfo ui)
@@ -143,32 +149,18 @@ namespace BdlGusExporterWPF
             _selectedIds.Clear();
         }
 
-        // --- Refactored Export Logic ---
         private async void BtnExport_Click(object sender, RoutedEventArgs e)
         {
-            if (_selectedIds.Count == 0)
-            {
-                MessageBox.Show("Brak jednostek do eksportu.", "Uwaga", MessageBoxButton.OK, MessageBoxImage.Warning);
-                return;
-            }
-            if (!File.Exists("variables.txt"))
-            {
-                MessageBox.Show("Brak pliku variables.txt", "Uwaga", MessageBoxButton.OK, MessageBoxImage.Warning);
-                return;
-            }
+            if (_selectedIds.Count == 0) { MessageBox.Show("Brak jednostek do eksportu.", "Uwaga", MessageBoxButton.OK, MessageBoxImage.Warning); return; }
+            if (!File.Exists("variables.txt")) { MessageBox.Show("Brak pliku variables.txt", "Uwaga", MessageBoxButton.OK, MessageBoxImage.Warning); return; }
 
             progressBar.Value = 0;
             txtStatus.Text = "Start eksportu...";
-            this.IsEnabled = false; // Disable UI during export
+            this.IsEnabled = false;
 
             try
             {
-                var varList = File.ReadAllLines("variables.txt")
-                    .Where(l => !string.IsNullOrWhiteSpace(l) && !l.TrimStart().StartsWith("#"))
-                    .Select(l => l.Split(',', 2))
-                    .Select(parts => (Id: parts[0].Trim(), Name: parts.Length > 1 ? parts[1].Trim() : parts[0].Trim()))
-                    .ToList();
-
+                var varList = File.ReadAllLines("variables.txt").Where(l => !string.IsNullOrWhiteSpace(l) && !l.TrimStart().StartsWith("#")).Select(l => l.Split(',', 2)).Select(parts => (Id: parts[0].Trim(), Name: parts.Length > 1 ? parts[1].Trim() : parts[0].Trim())).ToList();
                 var years = Enumerable.Range(DateTime.Now.Year - 5, 6).ToList();
                 var dataToExport = new Dictionary<string, List<ExportDataRow>>();
 
@@ -185,22 +177,23 @@ namespace BdlGusExporterWPF
                         var unitId = label.Substring(label.IndexOf('(') + 1).TrimEnd(')');
 
                         UpdateApiKey();
-                        using var doc = await _gusApiService.GetDataForUnitAsync(unitId, varId, years); // Use the service
-                        var dataDict = ParseDataFromDoc(doc);
 
-                        foreach (int y in years)
+                        using (await AcquireRateLimitPermit())
                         {
-                            dataDict.TryGetValue(y, out decimal? val);
-                            rowsForVar.Add(new ExportDataRow(varName, unitName, y, val));
+                            using var doc = await _gusApiService.GetDataForUnitAsync(unitId, varId, years);
+                            var dataDict = ParseDataFromDoc(doc);
+                            foreach (int y in years)
+                            {
+                                dataDict.TryGetValue(y, out decimal? val);
+                                rowsForVar.Add(new ExportDataRow(varName, unitName, y, val));
+                            }
                         }
                     }
                     progressBar.Value = ((double)(i + 1) / varList.Count) * 100;
                 }
 
-                // Use the Excel service to create the workbook
                 txtStatus.Text = "Generowanie pliku Excel...";
                 using var wb = _excelExportService.CreateWorkbook(dataToExport);
-
                 var dlg = new SaveFileDialog { Filter = "Excel Files|*.xlsx", FileName = "export.xlsx" };
                 if (dlg.ShowDialog() == true)
                 {
@@ -220,7 +213,7 @@ namespace BdlGusExporterWPF
             }
             finally
             {
-                this.IsEnabled = true; // Re-enable UI
+                this.IsEnabled = true;
                 progressBar.Value = 0;
             }
         }
@@ -234,10 +227,7 @@ namespace BdlGusExporterWPF
                 {
                     foreach (var valElement in values.EnumerateArray())
                     {
-                        if (valElement.TryGetProperty("year", out var yearEl) &&
-                            valElement.TryGetProperty("val", out var valEl) &&
-                            yearEl.TryGetInt32(out int year) &&
-                            valEl.TryGetDecimal(out decimal val))
+                        if (valElement.TryGetProperty("year", out var yearEl) && valElement.TryGetProperty("val", out var valEl) && yearEl.TryGetInt32(out int year) && valEl.TryGetDecimal(out decimal val))
                         {
                             dict[year] = val;
                         }
@@ -245,6 +235,37 @@ namespace BdlGusExporterWPF
                 }
             }
             return dict;
+        }
+
+        private bool IsUserRegistered() => chkUseApiKey.IsChecked == true && !string.IsNullOrWhiteSpace(txtApiKey.Text);
+
+        private async Task<IDisposable> AcquireRateLimitPermit()
+        {
+            var limiters = _rateLimiterService.GetLimiters(IsUserRegistered());
+            var leases = new List<RateLimitLease>();
+            try
+            {
+                foreach (var limiter in limiters)
+                {
+                    leases.Add(await limiter.AcquireAsync(1));
+                }
+                return new CompositeDisposable(leases);
+            }
+            catch
+            {
+                foreach (var lease in leases) lease.Dispose();
+                throw;
+            }
+        }
+
+        private sealed class CompositeDisposable : IDisposable
+        {
+            private readonly IEnumerable<IDisposable> _disposables;
+            public CompositeDisposable(IEnumerable<IDisposable> disposables) => _disposables = disposables;
+            public void Dispose()
+            {
+                foreach (var d in _disposables.Reverse()) d.Dispose();
+            }
         }
     }
 }
