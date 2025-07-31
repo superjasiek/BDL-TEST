@@ -122,17 +122,20 @@
           "buildTransitive/net6.0/_._": {}
         }
       },
-      "BdlGusExporter.Core/1.0.0": {
-        "type": "project",
-        "framework": ".NETCoreApp,Version=v8.0",
-        "dependencies": {
-          "ClosedXML": "0.105.0"
-        },
+      "System.Threading.RateLimiting/8.0.0": {
+        "type": "package",
         "compile": {
-          "bin/placeholder/BdlGusExporter.Core.dll": {}
+          "lib/net8.0/System.Threading.RateLimiting.dll": {
+            "related": ".xml"
+          }
         },
         "runtime": {
-          "bin/placeholder/BdlGusExporter.Core.dll": {}
+          "lib/net8.0/System.Threading.RateLimiting.dll": {
+            "related": ".xml"
+          }
+        },
+        "build": {
+          "buildTransitive/net6.0/_._": {}
         }
       }
     }
@@ -303,16 +306,40 @@
         "useSharedDesignerContext.txt"
       ]
     },
-    "BdlGusExporter.Core/1.0.0": {
-      "type": "project",
-      "path": "../BdlGusExporter.Core/BdlGusExporter.Core.csproj",
-      "msbuildProject": "../BdlGusExporter.Core/BdlGusExporter.Core.csproj"
+    "System.Threading.RateLimiting/8.0.0": {
+      "sha512": "7mu9v0QDv66ar3DpGSZHg9NuNcxDaaAcnMULuZlaTpP9+hwXhrxNGsF5GmLkSHxFdb5bBc1TzeujsRgTrPWi+Q==",
+      "type": "package",
+      "path": "system.threading.ratelimiting/8.0.0",
+      "files": [
+        ".nupkg.metadata",
+        ".signature.p7s",
+        "Icon.png",
+        "LICENSE.TXT",
+        "THIRD-PARTY-NOTICES.TXT",
+        "buildTransitive/net461/System.Threading.RateLimiting.targets",
+        "buildTransitive/net462/_._",
+        "buildTransitive/net6.0/_._",
+        "buildTransitive/netcoreapp2.0/System.Threading.RateLimiting.targets",
+        "lib/net462/System.Threading.RateLimiting.dll",
+        "lib/net462/System.Threading.RateLimiting.xml",
+        "lib/net6.0/System.Threading.RateLimiting.dll",
+        "lib/net6.0/System.Threading.RateLimiting.xml",
+        "lib/net7.0/System.Threading.RateLimiting.dll",
+        "lib/net7.0/System.Threading.RateLimiting.xml",
+        "lib/net8.0/System.Threading.RateLimiting.dll",
+        "lib/net8.0/System.Threading.RateLimiting.xml",
+        "lib/netstandard2.0/System.Threading.RateLimiting.dll",
+        "lib/netstandard2.0/System.Threading.RateLimiting.xml",
+        "system.threading.ratelimiting.8.0.0.nupkg.sha512",
+        "system.threading.ratelimiting.nuspec",
+        "useSharedDesignerContext.txt"
+      ]
     }
   },
   "projectFileDependencyGroups": {
     "net8.0-windows7.0": [
-      "BdlGusExporter.Core >= 1.0.0",
-      "ClosedXML >= 0.105.0"
+      "ClosedXML >= 0.105.0",
+      "System.Threading.RateLimiting >= 8.0.0"
     ]
   },
   "packageFolders": {
@@ -339,11 +366,7 @@
       "frameworks": {
         "net8.0-windows7.0": {
           "targetAlias": "net8.0-windows",
-          "projectReferences": {
-            "/app/BdlGusExporter.Core/BdlGusExporter.Core.csproj": {
-              "projectPath": "/app/BdlGusExporter.Core/BdlGusExporter.Core.csproj"
-            }
-          }
+          "projectReferences": {}
         }
       },
       "warningProperties": {
@@ -364,6 +387,10 @@
           "ClosedXML": {
             "target": "Package",
             "version": "[0.105.0, )"
+          },
+          "System.Threading.RateLimiting": {
+            "target": "Package",
+            "version": "[8.0.0, )"
           }
         },
         "imports": [
