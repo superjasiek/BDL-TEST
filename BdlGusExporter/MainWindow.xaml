@@ -117,6 +117,12 @@
                         Content="Eksportuj"
                         Width="120"
                         Click="BtnExport_Click"/>
+                <Button x:Name="btnClearCache"
+                        Content="Wyczyść cache"
+                        Width="120"
+                        Margin="0,20,0,0"
+                        Background="#FF78909C"
+                        Click="BtnClearCache_Click"/>
             </StackPanel>
 
             <!-- Lista wybranych jednostek -->
