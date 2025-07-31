@@ -10,6 +10,7 @@ using System.Windows.Controls;
 using System.Windows.Input;
 using ClosedXML.Excel;
 using Microsoft.Win32;
+using System.Threading.RateLimiting;
 
 namespace BdlGusExporterWPF
 {
@@ -18,15 +19,18 @@ namespace BdlGusExporterWPF
         private const string ApiBase = "https://bdl.stat.gov.pl/api/v1";
         private readonly HttpClient _httpClient = new HttpClient();
         private readonly List<string> _selectedIds = new List<string>();
+        private readonly ApiRateLimiter _apiRateLimiter = new ApiRateLimiter();
 
         public MainWindow()
         {
             InitializeComponent();
 
+            Closed += OnMainWindowClosed;
+
             // Obsługa klucza API
-            chkUseApiKey.Checked   += (_, __) => SetApiKey();
-            chkUseApiKey.Unchecked += (_, __) => SetApiKey();
-            txtApiKey.TextChanged  += (_, __) => { if (chkUseApiKey.IsChecked == true) SetApiKey(); };
+            chkUseApiKey.Checked   += (_, __) => { SetApiKey(); UpdateRateLimitDisplay(); };
+            chkUseApiKey.Unchecked += (_, __) => { SetApiKey(); UpdateRateLimitDisplay(); };
+            txtApiKey.TextChanged  += (_, __) => { if (chkUseApiKey.IsChecked == true) SetApiKey(); UpdateRateLimitDisplay(); };
 
             // Inicjalizacja drzewa
             treeUnits.AddHandler(TreeViewItem.ExpandedEvent, new RoutedEventHandler(TreeItem_Expanded));
@@ -34,6 +38,39 @@ namespace BdlGusExporterWPF
 
             // Obsługa Ctrl+klik dla szybkiego dodawania
             treeUnits.SelectedItemChanged += TreeUnits_SelectedItemChanged;
+
+            // Inicjalizacja wyświetlania limitów
+            UpdateRateLimitDisplay();
+        }
+
+        private bool IsUserRegistered() => chkUseApiKey.IsChecked == true && !string.IsNullOrWhiteSpace(txtApiKey.Text);
+
+        private void UpdateRateLimitDisplay()
+        {
+            txtRateLimitStatus.Text = _apiRateLimiter.GetStatistics(IsUserRegistered());
+        }
+
+        private void OnMainWindowClosed(object sender, EventArgs e)
+        {
+            _apiRateLimiter.Dispose();
+            _httpClient.Dispose();
+        }
+
+        private async Task<string> GetStringAsyncWithRateLimit(string url)
+        {
+            var isRegistered = IsUserRegistered();
+            RateLimitLease lease = null;
+            try
+            {
+                lease = await _apiRateLimiter.AcquireAsync(isRegistered);
+                var json = await _httpClient.GetStringAsync(url);
+                return json;
+            }
+            finally
+            {
+                lease?.Dispose();
+                Dispatcher.Invoke(UpdateRateLimitDisplay);
+            }
         }
 
         private void SetApiKey()
@@ -55,7 +92,7 @@ namespace BdlGusExporterWPF
             try
             {
                 var urlRoot = $"{ApiBase}/units?level=0&format=json";
-                var json    = await _httpClient.GetStringAsync(urlRoot);
+                var json    = await GetStringAsyncWithRateLimit(urlRoot);
                 var doc     = JsonDocument.Parse(json);
 
                 if (doc.RootElement.TryGetProperty("results", out var results))
@@ -80,8 +117,8 @@ namespace BdlGusExporterWPF
 
         private async void TreeItem_Expanded(object sender, RoutedEventArgs e)
         {
-            if (e.OriginalSource is TreeViewItem tvi 
-                && tvi.Tag is UnitInfo info 
+            if (e.OriginalSource is TreeViewItem tvi
+                && tvi.Tag is UnitInfo info
                 && tvi.Items.Count == 1)
             {
                 tvi.Items.Clear();
@@ -98,7 +135,7 @@ namespace BdlGusExporterWPF
                 try
                 {
                     var url  = $"{ApiBase}/units?parent-id={info.Id}&level={childLevel}&format=json&page-size=100";
-                    var json = await _httpClient.GetStringAsync(url);
+                    var json = await GetStringAsyncWithRateLimit(url);
                     var doc  = JsonDocument.Parse(json);
 
                     if (doc.RootElement.TryGetProperty("results", out var results))
@@ -219,7 +256,7 @@ namespace BdlGusExporterWPF
                         SetApiKey();
                         var queryYears = string.Join("&", years.Select(y => $"year={y}"));
                         var url        = $"{ApiBase}/data/by-unit/{unitId}?var-id={varId}&{queryYears}&format=json";
-                        var json       = await _httpClient.GetStringAsync(url);
+                        var json       = await GetStringAsyncWithRateLimit(url);
                         var doc        = JsonDocument.Parse(json);
                         var dict       = new Dictionary<int, decimal>();
                         if (doc.RootElement.TryGetProperty("results", out var resArr) && resArr.GetArrayLength() > 0)
