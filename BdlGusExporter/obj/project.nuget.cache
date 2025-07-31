@@ -1,0 +1,21 @@
+{
+  "version": 2,
+  "dgSpecHash": "9imIi5oNWlM=",
+  "success": true,
+  "projectFilePath": "C:\\nowe_bdl\\BdlGusExporter\\BdlGusExporterWPF.csproj",
+  "expectedPackageFiles": [
+    "C:\\Users\\jan.liniany\\.nuget\\packages\\closedxml\\0.104.0\\closedxml.0.104.0.nupkg.sha512",
+    "C:\\Users\\jan.liniany\\.nuget\\packages\\closedxml.parser\\1.2.0\\closedxml.parser.1.2.0.nupkg.sha512",
+    "C:\\Users\\jan.liniany\\.nuget\\packages\\documentformat.openxml\\3.0.1\\documentformat.openxml.3.0.1.nupkg.sha512",
+    "C:\\Users\\jan.liniany\\.nuget\\packages\\documentformat.openxml.framework\\3.0.1\\documentformat.openxml.framework.3.0.1.nupkg.sha512",
+    "C:\\Users\\jan.liniany\\.nuget\\packages\\excelnumberformat\\1.1.0\\excelnumberformat.1.1.0.nupkg.sha512",
+    "C:\\Users\\jan.liniany\\.nuget\\packages\\rbush\\3.2.0\\rbush.3.2.0.nupkg.sha512",
+    "C:\\Users\\jan.liniany\\.nuget\\packages\\sixlabors.fonts\\1.0.0\\sixlabors.fonts.1.0.0.nupkg.sha512",
+    "C:\\Users\\jan.liniany\\.nuget\\packages\\system.io.packaging\\8.0.0\\system.io.packaging.8.0.0.nupkg.sha512",
+    "C:\\Users\\jan.liniany\\.nuget\\packages\\microsoft.netcore.app.ref\\6.0.36\\microsoft.netcore.app.ref.6.0.36.nupkg.sha512",
+    "C:\\Users\\jan.liniany\\.nuget\\packages\\microsoft.windowsdesktop.app.ref\\6.0.36\\microsoft.windowsdesktop.app.ref.6.0.36.nupkg.sha512",
+    "C:\\Users\\jan.liniany\\.nuget\\packages\\microsoft.aspnetcore.app.ref\\6.0.36\\microsoft.aspnetcore.app.ref.6.0.36.nupkg.sha512",
+    "C:\\Users\\jan.liniany\\.nuget\\packages\\microsoft.netcore.app.host.win-x64\\6.0.36\\microsoft.netcore.app.host.win-x64.6.0.36.nupkg.sha512"
+  ],
+  "logs": []
+}

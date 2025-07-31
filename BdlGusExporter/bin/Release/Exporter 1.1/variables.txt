@@ -1,0 +1,40 @@
+6,ogółem
+7,mężczyźni
+8,kobiety
+34032,ogółem ogółem
+9,ogółem 24 lata i mniej
+10,ogółem 25-29
+11,ogółem 30-39
+12,ogółem 40-59
+259865,ogółem 40-49
+259862,ogółem 50-59
+13,ogółem 60 lat i więcej
+34033,mężczyźni ogółem
+20016,mężczyźni 24 lata i mniej
+20017,mężczyźni 25-29
+20018,mężczyźni 30-39
+20019,mężczyźni 40-59
+259866,mężczyźni 40-49
+259863,mężczyźni 50-59
+20020,mężczyźni 60 lat i więcej
+34034,kobiety ogółem
+9181,kobiety 24 lata i mniej
+9182,kobiety 25-29
+9183,kobiety 30-39
+9184,kobiety 40-59
+259867,kobiety 40-49
+259864,kobiety 50-59
+9185,kobiety 60 lat i więcej
+20026,ogółem
+21,przedstawiciele organów władzy państwowej i samorządowej, wyżsi urzędnicy i kierownicy przedsiębiorstw
+60589,przedstawiciele władz publicznych, wyżsi urzędnicy i kierownicy
+1574,parlamentarzyści, wyżsi urzędnicy i kierownicy
+22,specjaliści
+23,technicy i inny średni personel
+24,pracownicy biurowi
+25,pracownicy usług i sprzedawcy
+26,rolnicy, ogrodnicy, leśnicy i rybacy
+27,robotnicy wykwalifikowani
+1575,robotnicy przemysłowi i rzemieślnicy
+28,operatorzy i monterzy maszyn i urządzeń
+29,pracownicy wykonujący prace proste
