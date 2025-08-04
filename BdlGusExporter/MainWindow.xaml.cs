@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Net;
@@ -142,6 +143,34 @@ namespace BdlGusExporterWPF
             {
                 MessageBox.Show($"Błąd pobierania danych: {ex.Message}", "Błąd",
                                 MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+        }
+
+        private void HelpMenuItem_Click(object sender, RoutedEventArgs e)
+        {
+            string helpFilePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "help.pdf");
+            if (File.Exists(helpFilePath))
+            {
+                try
+                {
+                    new Process
+                    {
+                        StartInfo = new ProcessStartInfo(helpFilePath)
+                        {
+                            UseShellExecute = true
+                        }
+                    }.Start();
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show($"Nie można otworzyć pliku pomocy: {ex.Message}", "Błąd",
+                                    MessageBoxButton.OK, MessageBoxImage.Error);
+                }
+            }
+            else
+            {
+                MessageBox.Show($"Plik pomocy 'help.pdf' nie został znaleziony w folderze aplikacji.", "Brak pliku",
+                                MessageBoxButton.OK, MessageBoxImage.Information);
             }
         }
 
