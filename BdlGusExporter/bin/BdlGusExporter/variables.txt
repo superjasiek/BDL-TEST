@@ -1,0 +1,58 @@
+60191,Czytelnicy bibliotek publicznych na 1000 ludności
+58507,Członkowie grup artystycznych
+410640,Dzieci objęte opieką w żłobkach
+1617142,Dzieci objęte wychowaniem przedszkolnym
+1649859,Dzieci w żłobkach i klubach dziecięcych na 1000 dzieci w wieku do lat 3
+290444,Frekwencja wyborcza
+394536,Gaz
+58511,Grupy artystyczne
+194828,Lesistość
+274418,Liczba mieszkań
+1649860,Miejsca w żłobkach i klubach dziecięcych na 1000 dzieci w wieku do lat 3
+152550,Ochrona przeciwpożarowa
+410641,Odsetek dzieci objętych opieką w żłobkach
+634989,Odsetek osób w wieku 65 lat i więcej w populacji ogółem
+1548701,Osoby fizyczne prowadzące działalność gospodarczą
+395374,Podmioty nowo zarejestrowane
+60530,Podmioty wpisane do rejestru REGON na 10 tys. ludności
+1616687,Porady lekarskie ogółem
+454132,Pracujący na 1000 ludności
+60573,Przeciętna powierzchnia użytkowa mieszkania na 1 osobę
+68,Przyrost naturalny
+450551,Przyrost naturalny na 1000 ludności
+8868,Rolnictwo
+453193,Saldo migracji na 1000 ludności
+152761,Sekcja Q dział 86
+4074,Sport
+1646047,Udział obszarów prawnie chronionych w powierzchni ogółem
+396046,Udział powierzchni objętej obowiązującymi miejscowymi planami zagospodarowania przestrzennego w powierzchni ogółem
+59,Urodzenia żywe
+3552,Wydatki majątkowe inwestycyjne
+1365229,Wymeldowania ogółem
+1365224,Zameldowania ogółem
+65,Zgony ogółem
+8536,biblioteki
+1365541,drogi dla rowerów na 100 km2
+288080,drogi dla rowerów ogółem
+1548716,instytucje otoczenia biznesu na 10 tys. podmiotów gospodarki narodowej
+449,kanalizacja
+410643,liczba uczestników imprez na 1000 ludności
+60563,ludność w wieku nieprodukcyjnym na 100 osób w wieku produkcyjnym
+148156,mieszkania oddane do użytkowania na 1000 ludności
+1725013,podmioty gospodarcze w usługach wyższego rzędu (sekcje J-R) na 1000 ludności
+1646066,powierzchnia lasów
+1724791,"powierzchnia parków, zieleńców i terenów zieleni osiedlowej na 1 mieszkańca"
+747345,pozwolenia i zgłoszenia z projektem
+1633004,pracujący ogółem
+259886,rodziny otrzymujące zasiłki rodzinne na dzieci
+1365234,saldo migracji
+152712,sektor prywatny - spółki handlowe z udziałem kapitału zagranicznego
+259889,"udział dzieci w wieku do lat 17, na które rodzice otrzymują zasiłek rodzinny w ogólnej liczbie dzieci w tym wieku"
+473788,udział nowo zarejestrowanych podmiotów sektora kreatywnego w liczbie nowo zarejestrowanych podmiotów ogółem
+1621852,udział powierzchni terenów zieleni w powierzchni ogółem
+5070,wodociąg
+1243,zwiedzający muzea i oddziały
+1539661,zwiedzający muzea i oddziały na 1000 ludności
+3560,Świadczenia
+475707,ścieki bytowe odprowadzone siecią kanalizacyjną
+1890,Źródła dochodów
