@@ -254,6 +254,36 @@ namespace BdlGusExporterWPF
             }
         }
 
+        private string CreateUniqueSheetName(XLWorkbook workbook, string baseName)
+        {
+            const int maxSheetNameLength = 31;
+            // Invalid characters for Excel sheet names: []*/\?:
+            var invalidChars = new char[] { '[', ']', '*', '/', '\\', '?', ':' };
+            string sanitizedName = new string(baseName.Where(ch => !invalidChars.Contains(ch)).ToArray()).Trim();
+
+            if (string.IsNullOrWhiteSpace(sanitizedName))
+            {
+                sanitizedName = "Sheet";
+            }
+
+            if (sanitizedName.Length > maxSheetNameLength)
+            {
+                sanitizedName = sanitizedName.Substring(0, maxSheetNameLength);
+            }
+
+            string finalName = sanitizedName;
+            int i = 1;
+            while (workbook.Worksheets.Contains(finalName))
+            {
+                string suffix = $"_{i}";
+                int availableLength = maxSheetNameLength - suffix.Length;
+                string truncatedName = sanitizedName.Length > availableLength ? sanitizedName.Substring(0, availableLength) : sanitizedName;
+                finalName = truncatedName + suffix;
+                i++;
+            }
+            return finalName;
+        }
+
         private async void BtnExport_Click(object sender, RoutedEventArgs e)
         {
             if (_selectedIds.Count == 0)
@@ -290,7 +320,8 @@ namespace BdlGusExporterWPF
                     var (varId, varName) = varList[i];
                     txtStatus.Text = $"Pobieram zmienną {varName} ({i+1}/{totalVars})";
 
-                    var ws = wb.Worksheets.Add($"Var_{varId}");
+                    var sheetName = CreateUniqueSheetName(wb, varName);
+                    var ws = wb.Worksheets.Add(sheetName);
                     ws.Cell(1, 1).Value = "WSKAŹNIK";
                     ws.Cell(1, 2).Value = "JEDNOSTKA";
                     ws.Cell(1, 3).Value = "ROK";
