@@ -45,11 +45,11 @@ namespace BdlGusExporterWPF
             UpdateRateLimitDisplay();
         }
 
-        private bool IsUserRegistered() => chkUseApiKey.IsChecked == true && !string.IsNullOrWhiteSpace(txtApiKey.Text);
+        private string CurrentApiKey => chkUseApiKey.IsChecked == true ? txtApiKey.Text.Trim() : string.Empty;
 
         private void UpdateRateLimitDisplay()
         {
-            txtRateLimitStatus.Text = _apiRateLimiter.GetStatistics(IsUserRegistered());
+            txtRateLimitStatus.Text = _apiRateLimiter.GetStatistics(CurrentApiKey);
         }
 
         private void OnMainWindowClosed(object sender, EventArgs e)
@@ -65,13 +65,13 @@ namespace BdlGusExporterWPF
                 return cachedJson;
             }
 
-            var isRegistered = IsUserRegistered();
+            var apiKey = CurrentApiKey;
             const int maxRetries = 3;
             const int delayInMs = 1100; // 1.1 seconds to be safe
 
             for (int i = 0; i < maxRetries; i++)
             {
-                using (var lease = await _apiRateLimiter.AcquireAsync(isRegistered))
+                using (var lease = await _apiRateLimiter.AcquireAsync(apiKey))
                 {
                     if (!lease.IsAcquired)
                     {

@@ -1,7 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Threading.RateLimiting;
@@ -10,108 +8,82 @@ namespace BdlGusExporterWPF
 {
     public class ApiRateLimiter : IDisposable
     {
-        private readonly Dictionary<string, SlidingWindowRateLimiter> _anonymousLimiters;
-        private readonly Dictionary<string, SlidingWindowRateLimiter> _registeredLimiters;
+        private readonly PersistentRateLimiter _persistentRateLimiter;
 
-        private readonly Dictionary<string, SlidingWindowRateLimiterOptions> _anonymousOptions;
-        private readonly Dictionary<string, SlidingWindowRateLimiterOptions> _registeredOptions;
+        // 1-second limiter remains in-memory only as it's not critical to persist
+        private readonly SlidingWindowRateLimiter _anonymousSecondLimiter = new(new SlidingWindowRateLimiterOptions { PermitLimit = 5, Window = TimeSpan.FromSeconds(1), SegmentsPerWindow = 1, AutoReplenishment = true });
+        private readonly SlidingWindowRateLimiter _registeredSecondLimiter = new(new SlidingWindowRateLimiterOptions { PermitLimit = 10, Window = TimeSpan.FromSeconds(1), SegmentsPerWindow = 1, AutoReplenishment = true });
+
 
         public ApiRateLimiter()
         {
-            _anonymousOptions = new Dictionary<string, SlidingWindowRateLimiterOptions>
-            {
-                { "1s", new SlidingWindowRateLimiterOptions { PermitLimit = 5, Window = TimeSpan.FromSeconds(1), SegmentsPerWindow = 1, AutoReplenishment = true } },
-                { "15m", new SlidingWindowRateLimiterOptions { PermitLimit = 100, Window = TimeSpan.FromMinutes(15), SegmentsPerWindow = 1, AutoReplenishment = true } },
-                { "12h", new SlidingWindowRateLimiterOptions { PermitLimit = 1000, Window = TimeSpan.FromHours(12), SegmentsPerWindow = 1, AutoReplenishment = true } },
-                { "7d", new SlidingWindowRateLimiterOptions { PermitLimit = 10000, Window = TimeSpan.FromDays(7), SegmentsPerWindow = 1, AutoReplenishment = true } }
-            };
-            _anonymousLimiters = _anonymousOptions.ToDictionary(kvp => kvp.Key, kvp => new SlidingWindowRateLimiter(kvp.Value));
-
-            _registeredOptions = new Dictionary<string, SlidingWindowRateLimiterOptions>
-            {
-                { "1s", new SlidingWindowRateLimiterOptions { PermitLimit = 10, Window = TimeSpan.FromSeconds(1), SegmentsPerWindow = 1, AutoReplenishment = true } },
-                { "15m", new SlidingWindowRateLimiterOptions { PermitLimit = 500, Window = TimeSpan.FromMinutes(15), SegmentsPerWindow = 1, AutoReplenishment = true } },
-                { "12h", new SlidingWindowRateLimiterOptions { PermitLimit = 5000, Window = TimeSpan.FromHours(12), SegmentsPerWindow = 1, AutoReplenishment = true } },
-                { "7d", new SlidingWindowRateLimiterOptions { PermitLimit = 50000, Window = TimeSpan.FromDays(7), SegmentsPerWindow = 1, AutoReplenishment = true } }
-            };
-            _registeredLimiters = _registeredOptions.ToDictionary(kvp => kvp.Key, kvp => new SlidingWindowRateLimiter(kvp.Value));
+            _persistentRateLimiter = new PersistentRateLimiter();
+            _persistentRateLimiter.LoadState();
         }
 
-        public async Task<RateLimitLease> AcquireAsync(bool isRegistered, CancellationToken cancellationToken = default)
+        public async Task<RateLimitLease> AcquireAsync(string apiKey, CancellationToken cancellationToken = default)
         {
-            var limiters = isRegistered ? _registeredLimiters.Values.ToList() : _anonymousLimiters.Values.ToList();
-            var leases = new List<RateLimitLease>();
-            try
+            bool isRegistered = !string.IsNullOrWhiteSpace(apiKey);
+            var secondLimiter = isRegistered ? _registeredSecondLimiter : _anonymousSecondLimiter;
+
+            // First, acquire the 1-second in-memory lease
+            var secondLease = await secondLimiter.AcquireAsync(1, cancellationToken);
+            if (!secondLease.IsAcquired)
             {
-                foreach (var limiter in limiters)
-                {
-                    var lease = await limiter.AcquireAsync(1, cancellationToken);
-                    leases.Add(lease);
-                }
-                return new CompositeLease(leases);
+                // This shouldn't happen with AcquireAsync unless cancelled, but as a safeguard:
+                return secondLease;
             }
-            catch
+
+            // Then, check the persistent limiters
+            if (_persistentRateLimiter.TryAcquire(apiKey))
             {
-                foreach (var lease in leases)
-                {
-                    lease.Dispose();
-                }
-                throw;
+                // If successful, return a composite lease that holds the 1s lease
+                return new PersistentLease(secondLease, true);
+            }
+            else
+            {
+                // If persistent check fails, dispose the 1s lease and return a failed lease
+                secondLease.Dispose();
+                return new PersistentLease(null, false);
             }
         }
 
-        public string GetStatistics(bool isRegistered)
+        public string GetStatistics(string apiKey)
         {
-            var limiters = isRegistered ? _registeredLimiters : _anonymousLimiters;
-            var options = isRegistered ? _registeredOptions : _anonymousOptions;
-            var statsBuilder = new StringBuilder();
-            statsBuilder.Append("Dostępne limity: ");
+            return _persistentRateLimiter.GetStatistics(apiKey);
+        }
 
-            foreach (var (period, limiter) in limiters)
-            {
-                var stats = limiter.GetStatistics();
-                var permitLimit = options[period].PermitLimit;
-                if (stats != null)
-                {
-                    statsBuilder.Append($"| {period}: {stats.CurrentAvailablePermits}/{permitLimit} ");
-                }
-            }
-            return statsBuilder.ToString().TrimEnd();
+        public void SaveState()
+        {
+            _persistentRateLimiter.SaveState();
         }
 
         public void Dispose()
         {
-            foreach (var limiter in _anonymousLimiters.Values)
-            {
-                limiter.Dispose();
-            }
-            foreach (var limiter in _registeredLimiters.Values)
-            {
-                limiter.Dispose();
-            }
+            SaveState();
+            _anonymousSecondLimiter.Dispose();
+            _registeredSecondLimiter.Dispose();
         }
 
-        private class CompositeLease : RateLimitLease
+        // A custom lease class to represent the outcome of our combined limiting logic
+        private class PersistentLease : RateLimitLease
         {
-            private readonly List<RateLimitLease> _leases;
+            private readonly RateLimitLease _innerLease; // Can be null if not acquired
+            public override bool IsAcquired { get; }
 
-            public CompositeLease(List<RateLimitLease> leases)
+            public PersistentLease(RateLimitLease innerLease, bool acquired)
             {
-                _leases = leases;
+                _innerLease = innerLease;
+                IsAcquired = acquired;
             }
 
-            public override bool IsAcquired => true;
-
-            public override IEnumerable<string> MetadataNames => _leases.SelectMany(l => l.MetadataNames).Distinct();
+            public override IEnumerable<string> MetadataNames => _innerLease?.MetadataNames ?? System.Linq.Enumerable.Empty<string>();
 
             public override bool TryGetMetadata(string metadataName, out object metadata)
             {
-                foreach (var lease in _leases)
+                if (_innerLease != null)
                 {
-                    if (lease.TryGetMetadata(metadataName, out metadata))
-                    {
-                        return true;
-                    }
+                    return _innerLease.TryGetMetadata(metadataName, out metadata);
                 }
                 metadata = null;
                 return false;
@@ -121,10 +93,7 @@ namespace BdlGusExporterWPF
             {
                 if (disposing)
                 {
-                    foreach (var lease in _leases.AsEnumerable().Reverse())
-                    {
-                        lease.Dispose();
-                    }
+                    _innerLease?.Dispose();
                 }
             }
         }
