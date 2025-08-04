@@ -1,4 +1,0 @@
-72305, liczba ludności
-68, przyrost naturalny
-450551, przyrost naturalny na 1000
-1365291, pożary przypadające na 1000 ludności
