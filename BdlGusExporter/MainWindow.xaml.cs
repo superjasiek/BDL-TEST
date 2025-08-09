@@ -44,6 +44,79 @@ namespace BdlGusExporterWPF
 
             // Inicjalizacja wyświetlania limitów
             UpdateRateLimitDisplay();
+
+            PromptToLoadSettings();
+        }
+
+        private async void PromptToLoadSettings()
+        {
+            if (File.Exists("settings.json"))
+            {
+                var result = MessageBox.Show("Czy chcesz wczytać ustawienia z poprzedniej sesji?",
+                                              "Wczytywanie ustawień", MessageBoxButton.YesNo,
+                                              MessageBoxImage.Question);
+
+                if (result == MessageBoxResult.Yes)
+                {
+                    await LoadSettings();
+                }
+            }
+        }
+
+        private async Task LoadSettings()
+        {
+            try
+            {
+                var json = File.ReadAllText("settings.json");
+                var settings = JsonSerializer.Deserialize<UserSettings>(json);
+
+                if (settings != null)
+                {
+                    chkUseApiKey.IsChecked = settings.UseApiKey;
+                    txtApiKey.Text = settings.ApiKey;
+                    SetApiKey();
+
+                    _selectedIds.Clear();
+                    listSelected.Items.Clear();
+
+                    if (settings.SelectedUnitIds != null)
+                    {
+                        foreach (var unitId in settings.SelectedUnitIds)
+                        {
+                            var unitName = await GetUnitNameById(unitId);
+                            if (unitName != null)
+                            {
+                                _selectedIds.Add(unitId);
+                                listSelected.Items.Add($"{unitName} ({unitId})");
+                            }
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Nie udało się wczytać ustawień: {ex.Message}", "Błąd",
+                                MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+        }
+
+        private async Task<string> GetUnitNameById(string unitId)
+        {
+            try
+            {
+                var url = $"{ApiBase}/units/{unitId}?format=json";
+                var json = await GetStringAsyncWithRateLimit(url);
+                var doc = JsonDocument.Parse(json);
+                if (doc.RootElement.TryGetProperty("name", out var nameElement))
+                {
+                    return nameElement.GetString();
+                }
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"Failed to get unit name for ID {unitId}: {ex.Message}");
+            }
+            return null;
         }
 
         private string CurrentApiKey => chkUseApiKey.IsChecked == true ? txtApiKey.Text.Trim() : string.Empty;
@@ -55,8 +128,30 @@ namespace BdlGusExporterWPF
 
         private void OnMainWindowClosed(object sender, EventArgs e)
         {
+            SaveSettings();
             _apiRateLimiter.Dispose();
             _httpClient.Dispose();
+        }
+
+        private void SaveSettings()
+        {
+            var settings = new UserSettings
+            {
+                UseApiKey = chkUseApiKey.IsChecked == true,
+                ApiKey = txtApiKey.Text,
+                SelectedUnitIds = _selectedIds
+            };
+
+            try
+            {
+                var json = JsonSerializer.Serialize(settings);
+                File.WriteAllText("settings.json", json);
+            }
+            catch (Exception ex)
+            {
+                // Log or handle the exception if saving fails
+                Debug.WriteLine($"Failed to save settings: {ex.Message}");
+            }
         }
 
         private async Task<string> GetStringAsyncWithRateLimit(string url)
